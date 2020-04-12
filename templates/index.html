@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+    <body>
+        {% extends "base.html" %}
+        {% block content %}
+                <h1 class='text-center'>Дома на продажу</h1>
+                {% if current_user.is_authenticated and (current_user.is_realtor == True or current_user.id == 1) %}
+                    <a href="add_realty" class="btn btn-secondary">Добавить недвижимость</a>
+                {% endif %}
+                {% for realty in realties %}
+                    <h2>Недвижимость №{{realty.id}}</h2>
+                    <table class='table table-bordered'>
+                        <thead class="thead-light">
+                            <tr>
+                                {% if realty.photo %}
+                                    <th scope="col">Фото</th>
+                                {% endif %}
+                                <th scope="col">Риэлтор</th>
+                                <th scope="col">Описание</th>
+                                <th scope="col">Квартир не продано</th>
+                                <th scope="col">Адрес</th>
+                                <th scope="col">Стоимость одной квартиры в среднем</th>
+                                <th scope="col">Всё продано</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                {% if realty.photo %}
+                                    <td>
+                                        <img src={{realty.photo}} width=100>
+                                    </td>
+                                {% endif %}
+                                <td>
+                                    {{realtor[realty.id]}}
+                                </td>
+                                <td>
+                                    {{realty.house}}
+                                </td>
+                                <td>
+                                    {{realty.not_solded_flats}} квартир
+                                </td>
+                                <td>
+                                    {{realty.address}}
+                                </td>
+                                <td>
+                                    {{realty.cost}} рублей
+                                </td>
+                                {% if realty.is_sold == True %}
+                                    <td class="table-danger">
+                                        Продано
+                                    </td>
+                                {% else %}
+                                    <td class="table-success">
+                                        Есть свободные квартиры
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    {% if current_user.is_authenticated and (current_user.id == 1 or current_user.id == realty.realtor) %}
+                        <div>
+                            <a href="/edit_realty/{{ realty.id }}" class="btn btn-warning">Изменить</a>
+                            <a href="/realty_delete/{{ realty.id }}" class="btn btn-danger">Удалить</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+        {% endblock %}
+    </body>
+</html>
