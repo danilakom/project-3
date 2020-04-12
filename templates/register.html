@@ -35,15 +35,7 @@
                         </p>
                     {% endfor %}
                 </p>
-                <p>
-                    {{ form.is_realtor.label }}<br>
-                    {{ form.is_realtor(class="form-control") }}<br>
-                    {% for error in form.is_realtor.errors %}
-                        <p class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </p>
-                    {% endfor %}
-                </p>
+                <p>{{ form.is_realtor() }} {{ form.is_realtor.label }}</p>
                 <p>
                     {{ form.email.label }}<br>
                     {{ form.email(class="form-control", type="email") }}<br>
