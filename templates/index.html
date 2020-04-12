@@ -3,7 +3,6 @@
     <body>
         {% extends "base.html" %}
         {% block content %}
-                <h1 class='text-center'>Квартиры на продажу</h1>
                 <p>Сортировка</p>
                 <form method="post">
                     <p><select autofocus name="sort-by">
@@ -29,7 +28,7 @@
                                 {% endif %}
                                 <th scope="col">Свободных квартир</th>
                                 <th scope="col">Адрес</th>
-                                <th scope="col">Средняя стоимость квартиры(руб.)</th>
+                                <th scope="col">Средняя стоимость квартиры (руб.)</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -12,6 +12,6 @@ class Realties(SqlAlchemyBase):
     house = sqlalchemy.Column(sqlalchemy.String)
     not_solded_flats = sqlalchemy.Column(sqlalchemy.Integer)
     address = sqlalchemy.Column(sqlalchemy.String)
-    cost = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    cost = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     is_sold = sqlalchemy.Column(sqlalchemy.Boolean, nullable=True)
     user = orm.relation('User')

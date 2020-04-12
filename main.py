@@ -49,7 +49,7 @@ def index():
                 realtor[realty.id] = ' '.join([user.name, user.surname])
             else:
                 realtor[realty.id] = ''
-        return render_template('index.html', realties=realties, realtor=realtor, title='Недвижимость')
+        return render_template('index.html', realties=realties, realtor=realtor, title='Квартиры')
     elif request.method == 'POST':
         user = session.query(User).filter(User.id == current_user.id).first()
         user.sort = f'{request.form["sort-by"]}-{request.form["sort"]}'
@@ -106,7 +106,7 @@ def add_realty():
         if not yes:
             return render_template('add_realty.html',
                                message="Такого риэлтора не сущестсвует",
-                               title="Добавление недвижимости",
+                               title="Добавить дом",
                                form=form)
         realty.house = form.house.data
         if form.not_solded_flats.data:
@@ -114,8 +114,17 @@ def add_realty():
         else:
             realty.not_solded_flats = 0
         realty.address = form.address.data
-        realty.cost = form.cost.data
-        realty.is_sold = form.is_sold.data
+        k = 0
+        cost = ''
+        for i in list(str(form.cost.data))[::-1]:
+            if k == 3:
+                cost += ' '
+                cost += i
+                k = 1
+            else:
+                cost += i
+                k += 1
+        realty.cost = cost[::-1]
         if form.photo.data:
             f = form.photo.data
             filename = secure_filename(f.filename)
@@ -124,7 +133,7 @@ def add_realty():
         session.add(realty)
         session.commit()
         return redirect('/')
-    return render_template('add_realty.html', title='Добавление недвижимости', form=form)
+    return render_template('add_realty.html', title='Добавить дом', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -179,7 +188,7 @@ def edit_realty(id):
             form.house.data = realty.house
             form.not_solded_flats.data = realty.not_solded_flats
             form.address.data = realty.address
-            form.cost.data = realty.cost
+            form.cost.data = ''.join(realty.cost.split(' '))
         else:
             abort(404)
     if form.validate_on_submit():
@@ -196,12 +205,22 @@ def edit_realty(id):
             if not yes:
                 return render_template('add_realty.html',
                                 message="Такого риэлтора не сущестсвует",
-                                title = "Редактирование недвижимости",
+                                title = "Редактирование дома",
                                 form=form)
             realty.house = form.house.data
             realty.not_solded_flats = form.not_solded_flats.data
             realty.address = form.address.data
-            realty.cost = form.cost.data
+            k = 0
+            cost = ''
+            for i in list(str(form.cost.data))[::-1]:
+                if k == 3:
+                    cost += ' '
+                    cost += i
+                    k = 1
+                else:
+                    cost += i
+                    k += 1
+            realty.cost = cost[::-1]
             if form.photo.data:
                 f = form.photo.data
                 filename = secure_filename(f.filename)
@@ -211,11 +230,11 @@ def edit_realty(id):
             return redirect('/')
         else:
             abort(404)
-    return render_template('add_realty.html', title='Редактирование недвижимости', form=form)
+    return render_template('add_realty.html', title='Редактирование дома', form=form)
 
 
 if __name__ == "__main__":
     db_session.global_init("db/users.sqlite")
     session = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='127.0.0.1', port=port)
