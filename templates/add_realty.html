@@ -3,7 +3,7 @@
     <body>
         {% extends "base.html" %}
         {% block content %}
-        <h1>Добавление недвижимости</h1>
+        <h1>Добавить дом</h1>
         <form action="" method="post" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             {{ form.csrf_token }}
@@ -62,7 +62,6 @@
                     </p>
                 {% endfor %}
             </p>
-            <p>{{ form.is_sold() }} {{ form.is_sold.label }}</p>
             <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         </form>
         {% endblock %}

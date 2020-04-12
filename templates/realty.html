@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        {% extends "base.html" %}
+        {% block content %}
+            <h2 class="text-center">Дом №{{realty.id}}</h2>
+            <p class='text-center'>
+                <img src={{realty.photo}} align="middle" height=300 alt=""/><br>
+                Контактное лицо: {{realtor}}<br>
+                Описание: {{realty.house}}<br>
+                Свободных квартир: {{realty.not_solded_flats}}<br>
+                Расположен по адресу: {{realty.address}}<br>
+                Средняя стоимость квартиры: {{realty.cost}} рублей
+            </p>
+        {% endblock %}
+    </body>
+</html>

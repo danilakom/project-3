@@ -5,11 +5,10 @@ from flask_wtf.file import FileField, FileRequired
 
 
 class Add_Realty(FlaskForm):
-    realtor = StringField('Имя и фамилия риэлтора', validators=[DataRequired()])
-    house = StringField('Описание дома', validators=[DataRequired()])
-    not_solded_flats = IntegerField("Сколько квартир продается?", validators=[DataRequired()])
+    realtor = StringField('Имя и фамилия риелтора', validators=[DataRequired()])
+    house = StringField('Описание', validators=[DataRequired()])
+    not_solded_flats = IntegerField("Свободных квартир")
     address = StringField("Адрес", validators=[DataRequired()])
-    cost = IntegerField("Сколько стоит одна квартира в среднем?")
-    is_sold = BooleanField('Всё продано?')
-    photo = FileField("Добавьте фото дома")
+    cost = IntegerField("Средняя стоимость квартиры")
+    photo = FileField("Добавить фото дома")
     submit = SubmitField('Добавить')

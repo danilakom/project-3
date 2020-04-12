@@ -23,20 +23,23 @@ def load_user(user_id):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
-        user = session.query(User).filter(User.id == current_user.id).first()
-        if user.sort:
-            if user.sort == 'name-up':
-                realties = session.query(Realties).order_by(Realties.id)
-            elif user.sort == 'name-down':
-                realties = session.query(Realties).order_by(Realties.id)[::-1]
-            elif user.sort == 'cost-up':
-                realties = session.query(Realties).order_by(Realties.cost)[::-1]
-            elif user.sort == 'cost-down':
-                realties = session.query(Realties).order_by(Realties.cost)
-            elif user.sort == 'flats-up':
-                realties = session.query(Realties).order_by(Realties.not_solded_flats)
-            elif user.sort == 'flats-down':
-                realties = session.query(Realties).order_by(Realties.not_solded_flats)[::-1]
+        if current_user.is_authenticated:
+            user = session.query(User).filter(User.id == current_user.id).first()
+            if user.sort:
+                if user.sort == 'name-up':
+                    realties = session.query(Realties).order_by(Realties.id)
+                elif user.sort == 'name-down':
+                    realties = session.query(Realties).order_by(Realties.id)[::-1]
+                elif user.sort == 'cost-up':
+                    realties = session.query(Realties).order_by(Realties.cost)[::-1]
+                elif user.sort == 'cost-down':
+                    realties = session.query(Realties).order_by(Realties.cost)
+                elif user.sort == 'flats-up':
+                    realties = session.query(Realties).order_by(Realties.not_solded_flats)
+                elif user.sort == 'flats-down':
+                    realties = session.query(Realties).order_by(Realties.not_solded_flats)[::-1]
+            else:
+                realties = session.query(Realties)
         else:
             realties = session.query(Realties)
         realtor = {}
@@ -50,7 +53,17 @@ def index():
     elif request.method == 'POST':
         user = session.query(User).filter(User.id == current_user.id).first()
         user.sort = f'{request.form["sort-by"]}-{request.form["sort"]}'
+        session.commit()
         return redirect('/')
+
+
+@app.route('/realty/<int:id>')
+def realty(id):
+    realty = session.query(Realties).filter(Realties.id == id).first()
+    user = session.query(User).filter(User.id == realty.realtor).first()
+    if user:
+        r = ' '.join([user.name, user.surname])
+    return render_template('realty.html', realty=realty, realtor=r)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -96,7 +109,10 @@ def add_realty():
                                title="Добавление недвижимости",
                                form=form)
         realty.house = form.house.data
-        realty.not_solded_flats = form.not_solded_flats.data
+        if form.not_solded_flats.data:
+            realty.not_solded_flats = form.not_solded_flats.data
+        else:
+            realty.not_solded_flats = 0
         realty.address = form.address.data
         realty.cost = form.cost.data
         realty.is_sold = form.is_sold.data
@@ -164,7 +180,6 @@ def edit_realty(id):
             form.not_solded_flats.data = realty.not_solded_flats
             form.address.data = realty.address
             form.cost.data = realty.cost
-            form.is_sold.data = realty.is_sold
         else:
             abort(404)
     if form.validate_on_submit():
@@ -187,7 +202,6 @@ def edit_realty(id):
             realty.not_solded_flats = form.not_solded_flats.data
             realty.address = form.address.data
             realty.cost = form.cost.data
-            realty.is_sold = form.is_sold.data
             if form.photo.data:
                 f = form.photo.data
                 filename = secure_filename(f.filename)
