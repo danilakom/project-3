@@ -3,12 +3,24 @@
     <body>
         {% extends "base.html" %}
         {% block content %}
-                <h1 class='text-center'>Дома на продажу</h1>
+                <h1 class='text-center'>Квартиры на продажу</h1>
+                <p>Сортировка</p>
+                <form method="post">
+                    <p><select autofocus name="sort-by">
+                        <option value='name'>по имени</option>
+                        <option value='cost'>по стоимости</option>
+                        <option value='flats'>по свободным квартирам</option>
+                    </select><select name='sort'>
+                        <option value='up'>по возрастанию</option>
+                        <option value='down'>по убыванию</option>
+                    </select></p>
+                    <input type='submit' value="Фильтровать">
+                </form><br>
                 {% if current_user.is_authenticated and (current_user.is_realtor == True or current_user.id == 1) %}
-                    <a href="add_realty" class="btn btn-secondary">Добавить недвижимость</a>
+                    <a href="add_realty" class="btn btn-secondary">Добавить дом</a>
                 {% endif %}
                 {% for realty in realties %}
-                    <h2>Недвижимость №{{realty.id}}</h2>
+                    <h2>Дом №{{realty.id}}</h2>
                     <table class='table table-bordered'>
                         <thead class="thead-light">
                             <tr>
@@ -17,7 +29,7 @@
                                 {% endif %}
                                 <th scope="col">Риэлтор</th>
                                 <th scope="col">Описание</th>
-                                <th scope="col">Квартир не продано</th>
+                                <th scope="col">Продающихся квартирр</th>
                                 <th scope="col">Адрес</th>
                                 <th scope="col">Стоимость одной квартиры в среднем</th>
                                 <th scope="col">Всё продано</th>

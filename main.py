@@ -20,17 +20,37 @@ login_manager.init_app(app)
 def load_user(user_id):
     return session.query(User).get(user_id)
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    realties = session.query(Realties)
-    realtor = {}
-    for realty in realties:
-        user = session.query(User).filter(User.id == realty.realtor).first()
-        if user:
-            realtor[realty.id] = ' '.join([user.name, user.surname])
+    if request.method == 'GET':
+        user = session.query(User).filter(User.id == current_user.id).first()
+        if user.sort:
+            if user.sort == 'name-up':
+                realties = session.query(Realties).order_by(Realties.id)
+            elif user.sort == 'name-down':
+                realties = session.query(Realties).order_by(Realties.id)[::-1]
+            elif user.sort == 'cost-up':
+                realties = session.query(Realties).order_by(Realties.cost)[::-1]
+            elif user.sort == 'cost-down':
+                realties = session.query(Realties).order_by(Realties.cost)
+            elif user.sort == 'flats-up':
+                realties = session.query(Realties).order_by(Realties.not_solded_flats)
+            elif user.sort == 'flats-down':
+                realties = session.query(Realties).order_by(Realties.not_solded_flats)[::-1]
         else:
-            realtor[realty.id] = ''
-    return render_template('index.html', realties=realties, realtor=realtor, title='Недвижимость')
+            realties = session.query(Realties)
+        realtor = {}
+        for realty in realties:
+            user = session.query(User).filter(User.id == realty.realtor).first()
+            if user:
+                realtor[realty.id] = ' '.join([user.name, user.surname])
+            else:
+                realtor[realty.id] = ''
+        return render_template('index.html', realties=realties, realtor=realtor, title='Недвижимость')
+    elif request.method == 'POST':
+        user = session.query(User).filter(User.id == current_user.id).first()
+        user.sort = f'{request.form["sort-by"]}-{request.form["sort"]}'
+        return redirect('/')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -184,4 +204,4 @@ if __name__ == "__main__":
     db_session.global_init("db/users.sqlite")
     session = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='127.0.0.1', port=port)
