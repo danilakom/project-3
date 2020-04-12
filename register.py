@@ -8,7 +8,7 @@ class RegisterForm(FlaskForm):
     surname = StringField("Фамилия")
     name = StringField("Имя")
     age = IntegerField("Возраст")
-    is_realtor = BooleanField("Вы риэлтор?", validators=[DataRequired()])
+    is_realtor = BooleanField("Вы риэлтор?")
     email = EmailField("Email", validators=[DataRequired()])
     phone = StringField("Номер телефона")
     password = PasswordField("Password", validators=[DataRequired()])
