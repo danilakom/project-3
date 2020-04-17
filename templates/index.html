@@ -8,7 +8,6 @@
                     <p><select autofocus name="sort-by">
                         <option value='name'>дата добавления</option>
                         <option value='cost'>стоимость</option>
-                        <option value='flats'>свободные квартиры</option>
                     </select><select name='sort'>
                         <option value='up'>по возрастанию</option>
                         <option value='down'>по убыванию</option>
@@ -16,30 +15,22 @@
                     <input type='submit' value="Фильтровать">
                 </form><br>
                 {% if current_user.is_authenticated and (current_user.is_realtor == True or current_user.id == 1) %}
-                    <a href="add_realty" class="btn btn-secondary">Добавить дом</a><br>
+                    <a href="add_realty" class="btn btn-secondary">Добавить</a><br>
                 {% endif %}
                 {% for realty in realties %}
-                    <a href="/realty/{{realty.id}}">Дом №{{realty.id}}</a>
+                    <a href="/realty/{{realty.id}}">Объект №{{realty.id}}</a>
                     <table class='table table-bordered'>
                         <thead class="thead-light">
                             <tr>
-                                {% if realty.photo %}
-                                    <th scope="col">Фото</th>
-                                {% endif %}
-                                <th scope="col">Свободных квартир</th>
+                                <th scope="col">Описание</th>
                                 <th scope="col">Адрес</th>
-                                <th scope="col">Средняя стоимость квартиры (руб.)</th>
+                                <th scope="col">Стоимость (руб.)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                {% if realty.photo %}
-                                    <td>
-                                        <img src={{realty.photo}} width=100>
-                                    </td>
-                                {% endif %}
                                 <td>
-                                    {{realty.not_solded_flats}}
+                                    {{realty.desc}}
                                 </td>
                                 <td>
                                     {{realty.address}}

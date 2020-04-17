@@ -1,17 +1,68 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+         integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+         crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+         crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+         crossorigin="anonymous"></script>
+         <link rel="stylesheet" type='text/css' href="/static/css/realty.css">
+         <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    </head>
     <body>
         {% extends "base.html" %}
         {% block content %}
-            <h2 class="text-center">Дом №{{realty.id}}</h2>
-            <p class='text-center'>
-                <img src={{realty.photo}} align="middle" height=300 alt=""/><br>
-                Контактное лицо: {{realtor}}<br>
-                Описание: {{realty.house}}<br>
-                Свободных квартир: {{realty.not_solded_flats}}<br>
-                Адрес: {{realty.address}}<br>
-                Средняя стоимость квартиры: {{realty.cost}} рублей
-            </p>
+            <h1 class="text-center">Объект №{{realty.id}}</h1>
+            <div class="container">
+                <div id="carousel" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        {% for file in files %}
+                            <li data-target="#carousel" data-slide-to={{loop.index}}
+                                {% if loop.first %} class="active" {% endif %}></li>
+                        {% endfor %}
+                    </ol>
+                    <div class="carousel-inner">
+                        {% for file in files %}
+                            {% if loop.first %}
+                                <div class="carousel-item active">
+                            {% else %}
+                                <div class="carousel-item">
+                            {% endif %}
+                                    <img class="d-block w-100" src="/static/img/{{file}}" alt="">
+                                </div>
+                        {% endfor %}
+                    </div>
+                    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+            </div>
+            <div class='text-center c'>
+                <p>Контактное лицо: {{realtor}}</p>
+                <p>Описание: {{realty.desc}}</p>
+                {% if realty.house %}
+                    <p>Дом</p>
+                {% else %}
+                    <p>Квартира</p>
+                {% endif %}
+                <p>Адрес: {{realty.address}}</p>
+                <p>Стоимость: {{realty.cost}} рублей</p>
+                <script>
+                    function show(email, phone){
+                        swal ('Контакты', email + '\n' + phone)
+                    }
+                </script>
+                <p onclick="show('{{email}}', '{{phone}}')" class="btn btn-success">Связатся</p>
+            </div>
         {% endblock %}
     </body>
 </html>

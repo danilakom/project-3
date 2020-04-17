@@ -34,10 +34,6 @@ def index():
                     realties = session.query(Realties).order_by(Realties.cost)[::-1]
                 elif user.sort == 'cost-down':
                     realties = session.query(Realties).order_by(Realties.cost)
-                elif user.sort == 'flats-up':
-                    realties = session.query(Realties).order_by(Realties.not_solded_flats)
-                elif user.sort == 'flats-down':
-                    realties = session.query(Realties).order_by(Realties.not_solded_flats)[::-1]
             else:
                 realties = session.query(Realties)
         else:
@@ -63,7 +59,10 @@ def realty(id):
     user = session.query(User).filter(User.id == realty.realtor).first()
     if user:
         r = ' '.join([user.name, user.surname])
-    return render_template('realty.html', realty=realty, realtor=r)
+        e = user.email
+        p = user.phone
+    files = realty.photo.split(',')
+    return render_template('realty.html', realty=realty, realtor=r, files=files, email=e, phone=p)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -72,13 +71,15 @@ def login():
     if form.validate_on_submit():
         session = db_session.create_session()
         user = session.query(User).filter(User.email == form.email.data).first()
-        if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
-            return redirect("/")
-        return render_template('login.html',
-                               message="Неправильный логин или пароль",
-                               title="Авторизация",
-                               form=form)
+        try:
+            if user and user.check_password(form.password.data):
+                login_user(user, remember=form.remember_me.data)
+                return redirect("/")
+        except AttributeError:
+            return render_template('login.html',
+                                message="Неправильный логин или пароль",
+                                title="Авторизация",
+                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 
@@ -87,6 +88,42 @@ def login():
 def logout():
     logout_user()
     return redirect("/")
+
+@app.route('/user/<int:id>')
+@login_required
+def show_user(id):
+    user = session.query(User).filter(User.id == id).first()
+    return render_template('show_user.html', title="Личный кабинет", user=user)
+
+@app.route('/change_user/<int:id>', methods=["POST", "GET"])
+@login_required
+def change_user(id):
+    form = RegisterForm()
+    if request.method == 'GET':
+        user = session.query(User).filter(User.id == id).first()
+        if user:
+            form.surname.data = user.surname
+            form.name.data = user.name
+            form.age.data = user.age
+            form.is_realtor.data = user.is_realtor
+            form.email.data = user.email
+            form.phone.data = user.phone
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        user = session.query(User).filter(User.id == id).first()
+        if user:
+            user.surname = form.surname.data
+            user.name = form.name.data
+            user.age = form.age.data
+            user.is_realtor = form.is_realtor.data
+            user.email = form.email.data
+            user.phone = form.phone.data
+            user.set_password(form.password.data)
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('/register.html', title="Редактирование пользователя", form=form)
 
 
 @app.route('/add_realty', methods=['GET', 'POST'])
@@ -109,10 +146,7 @@ def add_realty():
                                title="Добавить дом",
                                form=form)
         realty.house = form.house.data
-        if form.not_solded_flats.data:
-            realty.not_solded_flats = form.not_solded_flats.data
-        else:
-            realty.not_solded_flats = 0
+        realty.desc = form.desc.data
         realty.address = form.address.data
         k = 0
         cost = ''
@@ -126,10 +160,13 @@ def add_realty():
                 k += 1
         realty.cost = cost[::-1]
         if form.photo.data:
-            f = form.photo.data
-            filename = secure_filename(f.filename)
-            f.save(f'static/img/{filename}')
-            realty.photo = f'static/img/{filename}'
+            p = []
+            for i in form.photo.data:
+                f = i
+                filename = secure_filename(f.filename)
+                f.save(f'static/img/{filename}')
+                p.append(filename)
+            realty.photo = ','.join(p)
         session.add(realty)
         session.commit()
         return redirect('/')
@@ -140,10 +177,6 @@ def add_realty():
 def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
-        if form.password.data != form.r_password.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
         if session.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
@@ -232,9 +265,12 @@ def edit_realty(id):
             abort(404)
     return render_template('add_realty.html', title='Редактирование дома', form=form)
 
+# TODO добавление квартиры или дома
+# TODO слайд шоу из фото
+
 
 if __name__ == "__main__":
     db_session.global_init("db/users.sqlite")
     session = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='127.0.0.1', port=port)

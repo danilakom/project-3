@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script src="/static/js/script1.js"></script>
+        <script src='/static/js/script2.js'></script>
+    </head>
     <body>
         {% extends "base.html" %}
         {% block content %}
@@ -56,7 +61,7 @@
                 </p>
                 <p>
                     {{ form.password.label }}<br>
-                    {{ form.password(class="form-control", type="password") }}<br>
+                    {{ form.password(class="form-control", type="password", id="pass", onkeyup="passcorr()") }}<br>
                     {% for error in form.password.errors %}
                         <p class="alert alert-danger" role="alert">
                             {{ error }}
@@ -65,7 +70,7 @@
                 </p>
                 <p>
                     {{ form.r_password.label }}<br>
-                    {{ form.r_password(class="form-control", type="password") }}<br>
+                    {{ form.r_password(class="form-control", type="password", id="checkPass", onblur="valid(event)") }}<br>
                     {% for error in form.r_password.errors %}
                         <p class="alert alert-danger" role="alert">
                             {{ error }}
@@ -74,6 +79,7 @@
                 </p>
                 <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
             </form>
+            <div id="err"></div>
         {% endblock %}
     </body>
 </html>

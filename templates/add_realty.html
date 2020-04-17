@@ -3,11 +3,11 @@
     <body>
         {% extends "base.html" %}
         {% block content %}
-        <h1>Добавить дом</h1>
+        <h1>Добавить оьъект</h1>
         <form action="" method="post" enctype="multipart/form-data">
             {{ form.hidden_tag() }}
             {{ form.csrf_token }}
-            {{message}}
+            <font color='red'>{{message}}</font>
             <p>
                 {{ form.realtor.label }}<br>
                 {{ form.realtor(class="form-control") }}<br>
@@ -17,19 +17,11 @@
                     </p>
                 {% endfor %}
             </p>
+            <p>{{ form.house() }} {{ form.house.label }}</p>
             <p>
-                {{ form.house.label }}<br>
-                {{ form.house(class="form-control") }}<br>
-                {% for error in form.house.errors %}
-                    <p content="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.not_solded_flats.label }}<br>
-                {{ form.not_solded_flats(class="form-control") }}<br>
-                {% for error in form.not_solded_flats.errors %}
+                {{ form.desc.label }}<br>
+                {{ form.desc(class="form-control") }}<br>
+                {% for error in form.desc.errors %}
                     <p content="alert alert-danger" role="alert">
                         {{ error }}
                     </p>

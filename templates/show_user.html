@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
+    </head>
+    <body>
+        {% extends "base.html" %}
+        {% block content %}
+            <h1 class='text-center'>Здравствуйте, {{user.surname}} {{user.name}}</h1>
+            <div class='container'>
+                <p>Указанный возраст: {{user.age}}</p>
+                {% if user.is_realtor %}
+                    <p>Вы являетесь риелтором</p>
+                {% else %}
+                    <p>Вы не являетесь риелтором</p>
+                {% endif %}
+                <p>Ваш email: {{user.email}}</p>
+                <p>Ваш номер телефона: {{user.phone}}</p>
+                <font color='green'>Ваш пароль надёжен</font>
+            </div>
+            <div class='text-center'>
+                <a type="button" class="btn btn-warning" href="/change_user/{{user.id}}">Изменить</a>
+                <a type="button" class="btn btn-danger" href='/logout'>Выйти</a>
+            </div>
+        {% endblock %}
+    </body>
+</html>

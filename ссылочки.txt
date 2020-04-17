@@ -1,0 +1,4 @@
+heroku:
+	https://web-project-3.herokuapp.com/
+github:
+	https://github.com/danilakom/project-3
