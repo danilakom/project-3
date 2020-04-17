@@ -12,6 +12,7 @@ import os
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 PHOTOS_PATH = '/static/img'
+sort = ''
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -22,20 +23,17 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    global sort
     if request.method == 'GET':
-        if current_user.is_authenticated:
-            user = session.query(User).filter(User.id == current_user.id).first()
-            if user.sort:
-                if user.sort == 'name-up':
-                    realties = session.query(Realties).order_by(Realties.id)
-                elif user.sort == 'name-down':
-                    realties = session.query(Realties).order_by(Realties.id)[::-1]
-                elif user.sort == 'cost-up':
-                    realties = session.query(Realties).order_by(Realties.cost)[::-1]
-                elif user.sort == 'cost-down':
-                    realties = session.query(Realties).order_by(Realties.cost)
-            else:
-                realties = session.query(Realties)
+        if sort:
+            if sort == 'name-up':
+                realties = session.query(Realties).order_by(Realties.id)
+            elif sort == 'name-down':
+                realties = session.query(Realties).order_by(Realties.id)[::-1]
+            elif sort == 'cost-up':
+                realties = session.query(Realties).order_by(Realties.cost)[::-1]
+            elif sort == 'cost-down':
+                realties = session.query(Realties).order_by(Realties.cost)
         else:
             realties = session.query(Realties)
         realtor = {}
@@ -47,9 +45,7 @@ def index():
                 realtor[realty.id] = ''
         return render_template('index.html', realties=realties, realtor=realtor, title='Квартиры')
     elif request.method == 'POST':
-        user = session.query(User).filter(User.id == current_user.id).first()
-        user.sort = f'{request.form["sort-by"]}-{request.form["sort"]}'
-        session.commit()
+        sort = f'{request.form["sort-by"]}-{request.form["sort"]}'
         return redirect('/')
 
 
@@ -164,8 +160,9 @@ def add_realty():
             for i in form.photo.data:
                 f = i
                 filename = secure_filename(f.filename)
-                f.save(f'static/img/{filename}')
-                p.append(filename)
+                if filename != '':
+                    f.save(f'static/img/{filename}')
+                    p.append(filename)
             realty.photo = ','.join(p)
         session.add(realty)
         session.commit()
