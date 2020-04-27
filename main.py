@@ -57,7 +57,10 @@ def realty(id):
         r = ' '.join([user.name, user.surname])
         e = user.email
         p = user.phone
-    files = realty.photo.split(',')
+    if realty.photo:
+        files = realty.photo.split(',')
+    else:
+        files = ''
     return render_template('realty.html', realty=realty, realtor=r, files=files, email=e, phone=p)
 
 
@@ -71,6 +74,11 @@ def login():
             if user and user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/")
+            else:
+                return render_template('login.html',
+                                message="Неправильный логин или пароль",
+                                title="Авторизация",
+                                form=form)
         except AttributeError:
             return render_template('login.html',
                                 message="Неправильный логин или пароль",
@@ -91,7 +99,6 @@ def show_user(id):
     return render_template('show_user.html', title="Личный кабинет", user=user)
 
 @app.route('/change_user/<int:id>', methods=["POST", "GET"])
-@login_required
 def change_user(id):
     form = RegisterForm()
     if request.method == 'GET':
@@ -131,7 +138,7 @@ def add_realty():
         n, f = form.realtor.data.split(' ')
         yes = False
         for user in session.query(User).all():
-            if user.name == n and user.surname == f:
+            if user.name.lower() == n.lower() and user.surname.lower() == f.lower():
                 yes = True
                 realty.realtor = user.id
                 break
@@ -154,7 +161,7 @@ def add_realty():
                 cost += i
                 k += 1
         realty.cost = cost[::-1]
-        if form.photo.data:
+        if form.photo.data[0].filename != '':
             p = []
             for i in form.photo.data:
                 f = i
@@ -219,7 +226,8 @@ def edit_realty(id):
         user = session.query(User).filter(User.id == realty.realtor).first()
         if realty:
             form.realtor.data = user.name + ' ' + user.surname
-            form.house.data = realty.house
+            form.house.data = True if realty.house == 0 else False
+            form.desc.data = realty.desc
             form.address.data = realty.address
             form.cost.data = ''.join(realty.cost.split(' '))
         else:
@@ -231,7 +239,7 @@ def edit_realty(id):
             n, f = form.realtor.data.split(' ')
             yes = False
             for user in session.query(User).all():
-                if user.name == n and user.surname == f:
+                if user.name.lower() == n.lower() and user.surname.lower() == f.lower():
                     yes = True
                     realty.realtor = user.id
                     break
@@ -253,11 +261,15 @@ def edit_realty(id):
                     cost += i
                     k += 1
             realty.cost = cost[::-1]
-            if form.photo.data:
-                f = form.photo.data
-                filename = secure_filename(f.filename)
-                f.save(f'static/img/{filename}')
-                realty.photo = f'static/img/{filename}'
+            if form.photo.data[0].filename != '':
+                p = []
+                for i in form.photo.data:
+                    f = i
+                    filename = secure_filename(f.filename)
+                    if filename != '':
+                        f.save(f'static/img/{filename}')
+                        p.append(filename)
+                realty.photo = ','.join(p)
             session.commit()
             return redirect('/')
         else:
@@ -269,4 +281,4 @@ if __name__ == "__main__":
     db_session.global_init("db/users.sqlite")
     session = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='127.0.0.1', port=port)
