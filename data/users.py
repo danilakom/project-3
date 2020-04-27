@@ -14,7 +14,7 @@ class User(SqlAlchemyBase, UserMixin):
     age = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     is_realtor = sqlalchemy.Column(sqlalchemy.Boolean)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
-    phone = sqlalchemy.Column(sqlalchemy.String, nullable=True, unique=True)
+    phone = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     sort = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
