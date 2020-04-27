@@ -12,7 +12,9 @@
             <form action="" method="post" novalidate>
                 {{ form.hidden_tag() }}
                 {{ form.csrf_token }}
-                {{message}}
+                {% if message %}
+                    <p class="alert alert-danger" role="alert">{{message}}</p>
+                {% endif %}
                 <p>
                     {{ form.surname.label }}<br>
                     {{ form.surname(class="form-control") }}<br>

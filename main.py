@@ -174,10 +174,11 @@ def add_realty():
 def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
-        if session.query(User).filter(User.email == form.email.data).first():
+        if session.query(User).filter((User.email == form.email.data) | (User.phone == form.phone.data)).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
-                                   message="Такой пользователь уже есть")
+                                   message="Такой пользователь уже есть!\
+                                            Убедитесь, что используете верные email и номер телефона")
         user = User(
             surname=form.surname.data,
             name=form.name.data,

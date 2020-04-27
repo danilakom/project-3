@@ -12,5 +12,5 @@ class RegisterForm(FlaskForm):
     email = EmailField("Email", validators=[DataRequired()])
     phone = StringField("Номер телефона")
     password = PasswordField("Пароль", validators=[DataRequired()])
-    r_password = PasswordField("Повторите пароль", validators=[DataRequired()])
+    r_password = PasswordField("Повторите пароль")
     submit = SubmitField("Submit")
