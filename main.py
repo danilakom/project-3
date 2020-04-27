@@ -220,7 +220,6 @@ def edit_realty(id):
         if realty:
             form.realtor.data = user.name + ' ' + user.surname
             form.house.data = realty.house
-            form.not_solded_flats.data = realty.not_solded_flats
             form.address.data = realty.address
             form.cost.data = ''.join(realty.cost.split(' '))
         else:
@@ -242,7 +241,6 @@ def edit_realty(id):
                                 title = "Редактирование дома",
                                 form=form)
             realty.house = form.house.data
-            realty.not_solded_flats = form.not_solded_flats.data
             realty.address = form.address.data
             k = 0
             cost = ''
