@@ -51,24 +51,23 @@ def index():
 
 @app.route('/realty/<int:id>')
 def realty(id):
-    realty = session.query(Realties).filter(Realties.id == id).first()
-    user = session.query(User).filter(User.id == realty.realtor).first()
+    r = session.query(Realties).filter(Realties.id == id).first()
+    user = session.query(User).filter(User.id == r.realtor).first()
     if user:
-        r = ' '.join([user.name, user.surname])
+        realtor = ' '.join([user.name, user.surname])
         e = user.email
         p = user.phone
-    if realty.photo:
-        files = realty.photo.split(',')
+    if r.photo:
+        files = r.photo.split(',')
     else:
         files = ''
-    return render_template('realty.html', realty=realty, realtor=r, files=files, email=e, phone=p)
+    return render_template('realty.html', realty=r, realtor=realtor, files=files, email=e, phone=p)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        session = db_session.create_session()
         user = session.query(User).filter(User.email == form.email.data).first()
         try:
             if user and user.check_password(form.password.data):
@@ -133,20 +132,8 @@ def change_user(id):
 def add_realty():
     form = Add_Realty()
     if form.validate_on_submit():
-        session = db_session.create_session()
         realty = Realties()
-        n, f = form.realtor.data.split(' ')
-        yes = False
-        for user in session.query(User).all():
-            if user.name.lower() == n.lower() and user.surname.lower() == f.lower():
-                yes = True
-                realty.realtor = user.id
-                break
-        if not yes:
-            return render_template('add_realty.html',
-                               message="Такого риэлтора не сущестсвует",
-                               title="Добавить дом",
-                               form=form)
+        realty.realtor = current_user.id
         realty.house = form.house.data
         realty.desc = form.desc.data
         realty.address = form.address.data
@@ -173,7 +160,7 @@ def add_realty():
         session.add(realty)
         session.commit()
         return redirect('/')
-    return render_template('add_realty.html', title='Добавить дом', form=form)
+    return render_template('add_realty.html', title='Добавить', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -196,6 +183,7 @@ def reqister():
             email=form.email.data)
         if form.phone.data:
             user.phone = form.phone.data
+        print(form.password.data)
         user.set_password(form.password.data)
         session.add(user)
         session.commit()
@@ -206,7 +194,6 @@ def reqister():
 @app.route("/realty_delete/<int:id>")
 @login_required
 def realty_delete(id):
-    session = db_session.create_session()
     realty = session.query(Realties).filter(Realties.id == id, (Realties.realtor == current_user.id) | (current_user.id == 1)).first()
     if realty:
         session.delete(realty)
@@ -221,11 +208,8 @@ def realty_delete(id):
 def edit_realty(id):
     form = Add_Realty()
     if request.method == 'GET':
-        session = db_session.create_session()
         realty = session.query(Realties).filter(Realties.id == id, (Realties.realtor == current_user.id) | (current_user.id == 1)).first()
-        user = session.query(User).filter(User.id == realty.realtor).first()
         if realty:
-            form.realtor.data = user.name + ' ' + user.surname
             form.house.data = True if realty.house == 0 else False
             form.desc.data = realty.desc
             form.address.data = realty.address
@@ -233,21 +217,9 @@ def edit_realty(id):
         else:
             abort(404)
     if form.validate_on_submit():
-        session = db_session.create_session()
         realty = session.query(Realties).filter(Realties.id == id, (Realties.realtor == current_user.id) | (current_user.id == 1)).first()
         if realty:
-            n, f = form.realtor.data.split(' ')
-            yes = False
-            for user in session.query(User).all():
-                if user.name.lower() == n.lower() and user.surname.lower() == f.lower():
-                    yes = True
-                    realty.realtor = user.id
-                    break
-            if not yes:
-                return render_template('add_realty.html',
-                                message="Такого риэлтора не сущестсвует",
-                                title = "Редактирование дома",
-                                form=form)
+            realty.realtor = current_user.id
             realty.house = form.house.data
             realty.address = form.address.data
             k = 0
@@ -281,4 +253,4 @@ if __name__ == "__main__":
     db_session.global_init("db/users.sqlite")
     session = db_session.create_session()
     port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='127.0.0.1', port=port)

@@ -58,7 +58,13 @@
                 <p>Стоимость: {{realty.cost}} рублей</p>
                 <script>
                     function show(email, phone){
-                        swal ('Контакты', email + '\n' + phone)
+                        if (phone == 'None') {
+                            var p = '';
+                        }
+                        else {
+                            var p = phone;
+                        }
+                        swal ('Контакты', email + '\n' + p);
                     }
                 </script>
                 <p onclick="show('{{email}}', '{{phone}}')" class="btn btn-success">Связатся</p>

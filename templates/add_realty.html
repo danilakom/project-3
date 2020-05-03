@@ -9,16 +9,6 @@
             {{ form.csrf_token }}
             <font color='red'>{{message}}</font>
             <p>
-                {{ form.realtor.label }}<br>
-                {{ form.realtor(class="form-control") }}<br>
-                {% for error in form.realtor.errors %}
-                    <p class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </p>
-                {% endfor %}
-            </p>
-            <p>{{ form.house() }} {{ form.house.label }}</p>
-            <p>
                 {{ form.desc.label }}<br>
                 {{ form.desc(class="form-control") }}<br>
                 {% for error in form.desc.errors %}
@@ -27,6 +17,7 @@
                     </p>
                 {% endfor %}
             </p>
+            <p>{{ form.house() }} {{ form.house.label }}</p>
             <p>
                 {{ form.address.label }}<br>
                 {{ form.address(class="form-control") }}<br>
